@@ -1,6 +1,7 @@
 import requests
 import telebot
 import logging
+import os
 import re
 
 from telebot import apihelper
@@ -11,9 +12,13 @@ from random import choice
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
 
-
-with open("api_key") as f:
-    api_key = f.read().strip()
+if "TG_TOKEN" in os.environ:
+    api_key = os.environ["TG_TOKEN"]
+elif (os.path.isfile("token")):
+    with open("token") as f:
+        api_key = f.read().strip()
+else:
+    raise Exception("No token supplied")
 
 
 try:
@@ -74,6 +79,7 @@ def choose_task_inline_handler(query):
 
 def has_task_param(message):
     return len(message.text.split(' ')) > 1
+
 
 def review_me():
     return "/choice@" + me.username
