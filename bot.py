@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import requests
 import telebot
 import logging
@@ -8,28 +10,11 @@ from telebot import apihelper
 from telebot import types
 from pprint import pformat, pprint
 from random import choice
+from telebot_factory import create_async_bot
 
+
+bot = create_async_bot()
 logger = telebot.logger
-telebot.logger.setLevel(logging.INFO)
-
-if "TG_TOKEN" in os.environ:
-    api_key = os.environ["TG_TOKEN"]
-elif (os.path.isfile("token")):
-    with open("token") as f:
-        api_key = f.read().strip()
-else:
-    raise Exception("No token supplied")
-
-
-try:
-    requests.get("https://api.telegram.org/bot%s/getMe" % api_key)
-except Exception as e:
-    logger.error("Cannot connect to t.me (%s)" % e)
-    logger.info("Trying to establish TOR socks5 proxy...")
-    apihelper.proxy = {'https': 'socks5://127.0.0.1:9150'}
-
-bot = telebot.AsyncTeleBot(api_key)
-me = bot.get_me().wait().wait()
 
 
 @bot.message_handler(commands=['choice'])
@@ -82,7 +67,7 @@ def has_task_param(message):
 
 
 def review_me():
-    return "/choice@" + me.username
+    return "/choice@" + bot.me.username
 
 
 def query_to_task(query: str):
@@ -103,13 +88,13 @@ def article(id, name, message_content):
 
 
 def fits_for_review(author: types.User):
-    def _fits_for_review2(admin: types.ChatMember):
+    def _fits_for_review(admin: types.ChatMember):
         if admin.user.is_bot:
             return False
 
         return author.id != admin.user.id
 
-    return _fits_for_review2
+    return _fits_for_review
 
 
 def userlink(user):
