@@ -58,7 +58,8 @@ def choose_task_inline_handler(query):
                 review_me() + " " + query_to_task(q)
                 )
     ]
-
+    user = query.from_user
+    logger.info("Found %s options for %s (%s)" % (len(options), user.first_name, user.username))
     bot.answer_inline_query(query.id, options)
 
 

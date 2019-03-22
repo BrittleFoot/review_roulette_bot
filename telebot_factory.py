@@ -1,6 +1,7 @@
 import os
 import telebot
 import logging
+import requests
 
 from log_config import config
 from loggingext import configure_system_logging
