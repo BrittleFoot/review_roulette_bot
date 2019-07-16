@@ -48,9 +48,8 @@ def gen_result_markup(reviewer_accepted, reviewer):
 
 def yes_no_callback(call):
     if not call.data.endswith(str(call.from_user.id)):
-        #bot.answer_callback_query(call.id, "Not for u")
-        #return
-        pass
+        bot.answer_callback_query(call.id, "Not for u")
+        return
 
     is_yes = call.data.startswith("yn_yes")
     is_no = call.data.startswith("yn_no")
