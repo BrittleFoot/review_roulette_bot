@@ -8,6 +8,8 @@ import re
 
 from telebot import apihelper
 from telebot import types
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 from pprint import pformat, pprint
 from random import choice
 from telebot_factory import create_async_bot
@@ -15,6 +17,68 @@ from telebot_factory import create_async_bot
 
 bot = create_async_bot()
 logger = telebot.logger
+
+
+def gen_yn_markup(user_id):
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 2
+    markup.add(
+        InlineKeyboardButton(choice(["🆗", "👌", "✅"]), callback_data="yn_yes_" + str(user_id)),
+        InlineKeyboardButton(choice(["❌", "⛔", "🙅‍"]), callback_data="yn_no_" + str(user_id))
+    )
+    return markup
+
+
+def gen_result_markup(reviewer_accepted, reviewer):
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 1
+
+    if reviewer_accepted:
+        e = choice(["⛏", "🌈", "🔥", "🎊", "🎉"])
+        markup.add(
+            InlineKeyboardButton(e + " " + reviewer.first_name + " accepted " + e, callback_data="y_accepted")
+        )
+        return markup
+
+    markup.add(
+        InlineKeyboardButton(reviewer.first_name + " declined. Reroll? 🎲", callback_data="n_reroll")
+    )
+    return markup
+
+
+def yes_no_callback(call):
+    if not call.data.endswith(str(call.from_user.id)):
+        #bot.answer_callback_query(call.id, "Not for u")
+        #return
+        pass
+
+    is_yes = call.data.startswith("yn_yes")
+    is_no = call.data.startswith("yn_no")
+
+    if is_yes:
+        word = choice(["charity", "work", "kindness", "power"])
+        response = "Thanks you for your " + word + "!"
+
+    elif is_no:
+        response = "Ok, maybe later ^-^ Stay tuned!"
+
+    bot.answer_callback_query(call.id, response)
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=gen_result_markup(is_yes, call.from_user))
+
+
+
+
+@bot.callback_query_handler(func=lambda call: True)
+def callback_query(call):
+    
+    if call.data.startswith("yn"):
+        return yes_no_callback(call);
+
+    if call.data == "n_reroll":
+        bot.answer_callback_query(call.id, "Not Implemented")
+
+    if call.data == "y_accepted":
+        bot.answer_callback_query(call.id, "Cool, yeah?")
 
 
 @bot.message_handler(commands=['choice'])
@@ -47,7 +111,7 @@ def brutal_choise_command(message):
             )
 
         logger.info("Start sent bagging: " + bagging)
-        bot.send_message(message.chat.id, bagging, parse_mode='Markdown').wait()
+        bot.send_message(message.chat.id, bagging, parse_mode='Markdown', reply_markup=gen_yn_markup(reviewer.id)).wait()
 
     except Exception as e:
         logger.error(e)
