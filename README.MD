@@ -1,6 +1,6 @@
 # Reviwew Roulette Bot
 
-Enhance your tg chat with ability to ask or demand people to review your code 0/
+Enhance your tg chat with the ability to ask or force people to review your code 0/
 
 ## ! 0-0 !
 
