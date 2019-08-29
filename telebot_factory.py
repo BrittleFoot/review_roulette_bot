@@ -18,7 +18,7 @@ def create_async_bot():
         with open("token") as f:
             api_key = f.read().strip()
     else:
-        raise Exception("No token supplied")
+        raise Exception("No token supplied, use TG_TOKEN env var or file named `token`")
 
     logger = telebot.logger
     configure_system_logging(telebot.logger, config['system'])

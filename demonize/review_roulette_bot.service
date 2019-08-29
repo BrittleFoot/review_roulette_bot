@@ -1,0 +1,25 @@
+[Unit]
+        Description = Review Roulette Telegram bot daemon
+        After = syslog.target
+        After = network.target
+
+[Service]
+        Type = simple
+        PIDFile = /var/run/review_roulette_bot.pid
+        RemainAfterExit = no
+        WorkingDirectory = ......
+
+        User = root
+        Group = root
+
+        OOMScoreAdjust = -100
+        Restart = always
+
+        ExecStart = ...../exec_start.sh
+        ExecStop = ....../exec_stop.sh
+        ExecReload = ..../exec_reload.sh
+
+        TimeoutSec = 60
+
+[Install]
+        WantedBy=multi-user.target
